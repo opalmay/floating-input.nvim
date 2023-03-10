@@ -50,27 +50,29 @@ M.input = function(opts, on_confirm, win_config)
 	vim.api.nvim_buf_set_text(buffer, 0, 0, 0, 0, { opts.default })
 
 	-- Put cursor at the end of the default value
-	vim.cmd('startinsert')
+	vim.cmd("startinsert")
 	vim.api.nvim_win_set_cursor(window, { 1, vim.str_utfindex(default) + 1 })
 
 	-- Enter to confirm
-	vim.keymap.set({ 'n', 'i', 'v' }, '<cr>', function()
+	vim.keymap.set({ "n", "i", "v" }, "<cr>", function()
 		local lines = vim.api.nvim_buf_get_lines(buffer, 0, 1, false)
-		if on_confirm then on_confirm(lines[1]) end
+		if on_confirm then
+			on_confirm(lines[1])
+		end
 		vim.api.nvim_win_close(window, true)
-		vim.cmd('stopinsert')
+		vim.cmd("stopinsert")
 	end, { buffer = buffer })
 
 	-- Esc to close
-	vim.api.nvim_create_autocmd({ 'BufLeave', 'InsertLeave' }, {
-		buffer = buffer,
-		callback = function()
-			vim.api.nvim_win_close(window, true)
-			vim.cmd('stopinsert')
-		end,
-	})
+	vim.keymap.set({ "n" }, "<ESC>", function()
+		vim.api.nvim_win_close(window, true)
+	end, { buffer = buffer })
 end
 
-M.setup = function() vim.ui.input = function(opts, on_confirm) M.input(opts, on_confirm, {}) end end
+M.setup = function()
+	vim.ui.input = function(opts, on_confirm)
+		M.input(opts, on_confirm, {})
+	end
+end
 
 return M
